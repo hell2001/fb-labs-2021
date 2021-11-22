@@ -103,7 +103,7 @@ bool language_recognition(string line)
     return true;
 }
 
-int linear_compare(int yi, int xi, int n)
+int linear_compare(int yi, int xi, int n, vector<int>solutions)
 {
     int _x = 0, _y = 0;
     int d = wide_euklid(yi, n, _x, _y);
@@ -117,14 +117,45 @@ int linear_compare(int yi, int xi, int n)
     }
     else if (d > 1 && xi % d == 0)
     {
-        int x = linear_compare(yi / d, xi / d, n / d);
-        vector<int>solutions;
+        int x = linear_compare(yi / d, xi / d, n / d, solutions);
         for (int c = 0; c < d; c += (n / d))
             solutions.push_back(x + c);
-        return solutions[0];
+        return 0;
     }
     else
         return -1;
+}
+
+int search_text(int a, int sb[5], int open_bigrams[5], int& st3, int& st1, string& alphabet, string& line)
+{
+    int b = sb[st3] - a * open_bigrams[st1];
+    for (; b >= 961; b -= 961) {}
+    for (; b < 0; b += 961) {}
+    string open_text;
+    for (int count = 0; count < line.length(); count += 2)
+    {
+        int x_i = (find_number(line[count], alphabet) * 31 + find_number(line[count + 1], alphabet)) - b;
+        for (; x_i >= 961; x_i -= 961) {}
+        for (; x_i < 0; x_i += 961) {}
+        int x11 = 0, y11 = 0;
+        wide_euklid(a, 961, x11, y11);
+        int xx = x11 * x_i;
+        for (; xx < 0; xx += 961) {}
+        for (; xx >= 961; xx -= 961) {}
+        int sec = xx % 31;
+        int fir = (xx - sec) / 31;
+        open_text += alphabet[fir];
+        open_text += alphabet[sec];
+    }
+    if (language_recognition(open_text) == true)
+    {
+        cout << "ТЕКСТ РАСПОЗНАНО\nКЛЮЧ: a = " << a << ", b = " << b << endl << endl;
+        cout << open_text << endl;
+        system("pause");
+        return 0;
+    }
+    else
+        return 1;
 }
 
 int main()
@@ -172,33 +203,18 @@ int main()
                             int yi = x__ - sb[st4];
                             if (yi < 0)
                                 yi += 961;
-                            int a = linear_compare(yi, xi, 961);
-                            a += 961;
-                            int b = sb[st3] - a * open_bigrams[st1];
-                            for (; b >= 961; b -= 961) {}
-                            for (; b < 0; b += 961) {}
-                            string open_text;
-                            for (int count = 0; count < line.length(); count += 2)
+                            vector<int>solutions;
+                            int a = linear_compare(yi, xi, 961, solutions);
+                            if (a < 0)
+                                a += 961;
+                            if (a != 0)
+                                search_text(a, sb, open_bigrams, st3, st1, alphabet, line);
+                            else
                             {
-                                int x_i = (find_number(line[count], alphabet) * 31 + find_number(line[count + 1], alphabet)) - b;
-                                for (; x_i >= 961; x_i -= 961) {}
-                                for (; x_i < 0; x_i += 961) {}
-                                int x11 = 0, y11 = 0;
-                                wide_euklid(a, 961, x11, y11);
-                                int xx = x11 * x_i;
-                                for (; xx < 0; xx += 961) {}
-                                for (; xx >= 961; xx -= 961) {}
-                                int sec = xx % 31;
-                                int fir = (xx - sec) / 31;
-                                open_text += alphabet[fir];
-                                open_text += alphabet[sec];
-                            }
-                            if (language_recognition(open_text) == true)
-                            {
-                                cout << "ТЕКСТ РАСПОЗНАНО\nКЛЮЧ: a = " << a << ", b = " << b << endl << endl;
-                                cout << open_text << endl;
-                                system("pause");
-                                return 0;
+                                for (int crt = 0; ctr < solutions.size(); ++ctr)
+                                {
+                                    search_text(solutions[ctr], sb, open_bigrams, st3, st1, alphabet, line);
+                                }
                             }
                         }
                     }
@@ -207,4 +223,3 @@ int main()
         }
     }
 }
-
