@@ -103,6 +103,30 @@ bool language_recognition(string line)
     return true;
 }
 
+int linear_compare(int yi, int xi, int n)
+{
+    int _x = 0, _y = 0;
+    int d = wide_euklid(yi, n, _x, _y);
+    if (d == 1)
+    {
+        int a = _x * xi;
+        for (; a >= n; a -= n) {}
+        for (; a < 0; a += n) {}
+        wide_euklid(a, n, _x, _y);
+        return _x;
+    }
+    else if (d > 1 && xi % d == 0)
+    {
+        int x = linear_compare(yi / d, xi / d, n / d);
+        vector<int>solutions;
+        for (int c = 0; c < d; c += (n / d))
+            solutions.push_back(x + c);
+        return solutions[0];
+    }
+    else
+        return -1;
+}
+
 int main()
 {
     SetConsoleCP(1251);
@@ -148,15 +172,8 @@ int main()
                             int yi = x__ - sb[st4];
                             if (yi < 0)
                                 yi += 961;
-                            int _x = 0, _y = 0;
-                            wide_euklid(yi, 961, _x, _y);
-                            int a = _x * xi;
-                            for (; a >= 961; a -= 961) {}
-                            for (; a < 0; a += 961) {}
-                            wide_euklid(a, 961, _x, _y);
-                            a = _x;
-                            if (a < 0)
-                                a += 961;
+                            int a = linear_compare(yi, xi, 961);
+                            a += 961;
                             int b = sb[st3] - a * open_bigrams[st1];
                             for (; b >= 961; b -= 961) {}
                             for (; b < 0; b += 961) {}
