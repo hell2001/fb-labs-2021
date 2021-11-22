@@ -103,7 +103,7 @@ bool language_recognition(string line)
     return true;
 }
 
-int linear_compare(int yi, int xi, int n, vector<int>solutions)
+int linear_compare(int yi, int xi, int n, vector<int>& solutions)
 {
     int _x = 0, _y = 0;
     int d = wide_euklid(yi, n, _x, _y);
@@ -203,10 +203,14 @@ int main()
                             int yi = x__ - sb[st4];
                             if (yi < 0)
                                 yi += 961;
-                            vector<int>solutions;
+                            vector<int> solutions;
                             int a = linear_compare(yi, xi, 961, solutions);
+
+                            
                             if (a < 0)
                                 a += 961;
+
+
                             if (a != 0)
                                 search_text(a, sb, open_bigrams, st3, st1, alphabet, line);
                             else
