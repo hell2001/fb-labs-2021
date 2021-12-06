@@ -38,12 +38,19 @@ def verify(signed, message, e, n):
     return message == pow(signed, e, n)
 
 
-def send_key(message, signed, n_recv, e_recv):
-    return pow(message, e_recv, n_recv), pow(signed, e_recv, n_recv)
+def send_key(message, n_recv, e_recv, d, n):
+    signed =  sign(message, d, n)
+    k1 = encrypt(message, e_recv, n_recv)
+    s1 = encrypt(signed, e_recv, n_recv)
+    return k1, s1
 
 
-def receive_key(cryptogram, signed, n, d):
-    return pow(cryptogram, d, n), pow(signed, d, n)
+def receive_key(cryptogram, signed, n, d, n_recv, e_recv):
+    k = decrypt(cryptogram, d, n)
+    s = decrypt(signed, d, n)
+    check = verify(s, k, e_recv, n_recv)
+    print(f"check sign {check}")
+    return pow(cryptogram, d, n), pow(signed, d, n), check
 
 
 # Generate four prime numbers
@@ -82,11 +89,10 @@ print(f"<B> verify message {verify(signed, message, eA, nA)}")
 print("Protocol")
 # Message and sign of A
 k = 1234567890
-s = sign(message, dA, nA)
 
-k1, s1 = send_key(k, s, nB, eB)
+k1, s1 = send_key(k, nB, eB, dA, nA)
 print(f"<A> generate  k1 = {k1}, s1 = {s1}")
 
-k, s = receive_key(k1, s1, nB, dB)
+k, s, check = receive_key(k1, s1, nB, dB, nA, eA)
 print(f"<B> receive k = {k}, s = {s}")
-print(f"<B> check sign {verify(s, k, eA, nA)}")
+print(f"<B> check sign {check}")
